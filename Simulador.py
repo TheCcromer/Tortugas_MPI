@@ -40,7 +40,7 @@ class Simulador:
 	@classmethod
 	def inicializar_arribada(cls, comportamiento, nt):
 		comportamiento_tortugas = comportamiento
-		tortugas = Tortuga.crear_lista_tortugas(nt) # falta el comportamiento
+		tortugas = Tortuga.crear_lista_tortugas(nt) # falta el comportamiento, yo ya lo hice pero hay que revisarlo y tal vez adaptarlo para que sea más parecido al suyo charlie
 		return
 
 	## EFE: Inicializa el transecto paralelo a la berma.
