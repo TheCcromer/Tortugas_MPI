@@ -67,4 +67,4 @@ class Tortuga:
 	## EFE: avanza la tortuga de acuerdo con su estado
 	def avanzar(self):
 		return
-	
+	##
