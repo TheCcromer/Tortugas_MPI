@@ -41,8 +41,9 @@ class Simulador:
 	def inicializar_arribada(cls, comportamiento, nt):
 		comportamiento_tortugas = comportamiento
 		tortugas = Tortuga.crear_lista_tortugas(nt) # falta el comportamiento, yo ya lo hice pero hay que revisarlo y tal vez adaptarlo para que sea más parecido al suyo charlie
+		##para saber que tortugas ya fueron activadas pueden tener un atributo booleano "activada" y que solo puedan avanzar las que tengan este atributo como true 
 		return
-	##para saber que tortugas ya fueron activadas pueden tener un atributo booleano "activada" y que solo puedan avanzar las que tengan este atributo como true 
+	
 	## EFE: Inicializa el transecto paralelo a la berma.
 	@classmethod
 	def inicializar_transecto_berma(cls, tb):
