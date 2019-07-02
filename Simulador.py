@@ -20,9 +20,34 @@ class Simulador:
 	conteo_tpb = 0 		## variable para el conteo basado en transecto paralelo
 	conteo_tsv = 0		## variable para el conteo basado en transectos verticales
 	conteo_cs = 0		## variable para el conteo basado en cuadrantes
-	
+	cantidad_arribadas = 0
+	id_marea = 0 #para decir si la marea es baja, media o alta 1 es baja, 2 es media, 3 es alta
 	## MÉTODOS DE CLASE
 	
+	## utilizar archivo para sacar el tiempo y la altura que se requiere
+	@classmethod
+	def determinar_altura_marea(archivo):
+		return 0.004301 * tic + 0.6
+	
+	
+	##devuelve un booleano indicando que el tipo de marea cambio
+	@classmethod
+	def determinar_tipo_marea(): 
+		marea_id = 0
+		bool hubo_cambio = False
+		if(determinar_altura_marea() >= marea[0] and determinar_altura_marea() < marea[1] ):
+			marea_id = 1
+			cantidad_arribadas = cantidad_arribadas+1
+			hubo_cambio = True
+		elif(determinar_altura_marea() >= marea[1] and determinar_altura_marea() < marea[2]):
+			marea_id = 2
+			cantidad_arribadas = cantidad_arribadas+1
+			hubo_cambio = True
+		elif(determinar_altura_marea() >= marea[2] and determinar_altura_marea() < marea[2]):
+			marea_id = 3
+			cantidad_arribadas = cantidad_arribadas+1
+			hubo_cambio = True
+		return hubo_cambio
 	## EFE:Inicializa los sectores de playa con sp. 
 	@classmethod
 	def inicializar_playa(cls, sp):
@@ -38,12 +63,23 @@ class Simulador:
 	## EFE: Inicializa la arribada con el comportamiento de las tortugas y la cantidad 
 	## indicada por nt de tortugas a simular.
 	@classmethod
-	def inicializar_arribada(cls, comportamiento, nt):
+	def inicializar_arribada(cls, comportamiento, nt): #se debe llamar este metodo cada vez que haya un cambio en la marea, las tortugas inicializadas avanzan
 		comportamiento_tortugas = comportamiento
-		tortugas = Tortuga.crear_lista_tortugas(nt) # falta el comportamiento, yo ya lo hice pero hay que revisarlo y tal vez adaptarlo para que sea más parecido al suyo charlie
-		##para saber que tortugas ya fueron activadas pueden tener un atributo booleano "activada" y que solo puedan avanzar las que tengan este atributo como true 
+		tortugas = Tortuga.crear_lista_tortugas(nt) # falta el comportamiento
+		if(id_marea == 1 and cantidad_arribadas == 0):
+			cantidad_arribadas = cantidad_arribadas+1
+			for i in range(0.25 * len(tortugas)):
+				tortugas[i].avanzar()
+		elif(id_marea == 2 and cantidad_arribadas == 1):
+			cantidad_arribadas = cantidad_arribadas+1
+			for i in range(0.26 * len(tortugas),0.50 * len(tortugas)):
+				tortugas[i].avanzar()
+		elif(id_marea == 3 and cantidad_arribadas == 2):
+			cantidad_arribadas = cantidad_arribadas+1
+			for i in range(0.51 * len(tortugas),len(tortugas)):
+					tortugas[i].avanzar()
 		return
-	
+
 	## EFE: Inicializa el transecto paralelo a la berma.
 	@classmethod
 	def inicializar_transecto_berma(cls, tb):
@@ -61,7 +97,8 @@ class Simulador:
 	def inicializar_cuadrantes(cls, cs):
 		cuadrantes = cs
 		return	
-	
+		
+
 	## DE ESTA CLASE SIMULADOR SÓLO EXISTIRÍA UNA INSTANCIA (SINGLETON).
 	## POR LO QUE NO SE INCLUYEN MÉTODOS DE INSTANCIA, SÓLO MÉTODOS DE CLASE.
 
