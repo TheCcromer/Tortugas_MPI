@@ -54,7 +54,7 @@ def crear_lista_de_archivos():
 def lectura_de_archivos(archivos_csv):
 	data_csv_matriz = []
 	for i in range(len(archivos_csv)):
-		if(i == 2 or i == 1 or 3):	
+		if(i == 2 or i == 1 or i == 3):	
 			try:
 				with open(archivos_csv[i]) as ct_csv:  #with open es la ruta donde se abre el archivo 
 					data_csv_matriz.append(lee_numeros_csv(ct_csv,Tipos_numeros.float))
@@ -71,16 +71,19 @@ def lectura_de_archivos(archivos_csv):
 	return data_csv_matriz
 
 def inicializar_simulaciones(data_csv_matriz):
+	## solo es necesario inicializarlos una vez
+	Simulador.inicializar_marea(data_csv_matriz[1],0)
+	Simulador.inicializar_playa(data_csv_matriz[3])
+	Simulador.inicializar_transecto_berma(data_csv_matriz[5])
+	Simulador.inicializar_transectos_verticales(data_csv_matriz[4])
+	Simulador.inicializar_cuadrantes(data_csv_matriz[6])
+	Simulador.inicializar_contadores(Contador.crea_lista_Contadores(data_csv_matriz[5][0][0]), Contador.crea_lista_Contadores(data_csv_matriz[4][0][0]),Contador.crea_lista_Contadores(data_csv_matriz[6][0][0]))
 	for i in range (3):
-		Simulador.inicializar_marea(data_csv_matriz[1],0)
-		Simulador.inicializar_playa(data_csv_matriz[3])
-		Simulador.inicializar_transecto_berma(data_csv_matriz[5])
-		Simulador.inicializar_transectos_verticales(data_csv_matriz[4])
-		Simulador.inicializar_cuadrantes(data_csv_matriz[6])
+		Simulador.inicializar_tortugas(Tortuga.crea_lista_tortugas(int(data_csv_matriz[0][i][2])))
+		Simulador.simular(data_csv_matriz[1][0][2])
 
 def main():
 	archivos_csv = crear_lista_de_archivos()
 	data_csv_matriz = lectura_de_archivos(archivos_csv)
 	inicializar_simulaciones(data_csv_matriz)
-	
 main()

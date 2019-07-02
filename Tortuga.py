@@ -2,6 +2,7 @@
 import enum
 import numpy as np	# para generar números al azar según distribución estándar
 import json			# para crear una hilera json en toJSON()
+import random
 
 class Tortuga:
 	"""
@@ -10,8 +11,7 @@ class Tortuga:
 	
 	## VARIABLES DE CLASE
 	id = 0 		## OJO variable static de clase para generar ids de tortugas
-	duraciones = [] ## variable para saber cuanto dura cada estado de cada tortuga a partir de camar
-	duracion_actual = 0
+	
 	## MÉTODOS DE CLASE
 	""" metodo de clase que genera N tortugas """
 	@classmethod
@@ -39,8 +39,8 @@ class Tortuga:
 		Tortuga.id += 1
 		self.velocidad = np.random.normal(1.0, 0.5) ## promedio = 1.0 y desviación estándar = 0.5
 		self.posicion = random.randint(0, 1499), random.randint(0, 1499) ## OJO: así se crea un par ordenado, un tuple de dos valores
-		self.estado = Tortuga.EstadoTortuga.vagar
-		return
+		self.estado = Tortuga.EstadoTortuga.inactiva ##se inicializa inactiva y cuando arriba es cuando se le asigna el estado de vagar
+		return 
 	
 	## EFE: retorna una hilera en formato JSON que representa a la tortuga
 	def toJSON(self):
@@ -64,9 +64,7 @@ class Tortuga:
 	def asg_posicion(self, pn):
 		self.posicion = pn
 		return
-		
-	## hay que ver si ubicar este metodo en la clase tortuga o en la clase del main
-	## devuelve un booleano que es true si se desactivo la tortuga o false si no se desactivo
+	 
 	@classmethod
 	def proba_desactivarse(self, archivo):
 		probabilidad  = np.random.uniform(low = 0.0, high = 1.0, size = None)
@@ -87,7 +85,7 @@ class Tortuga:
 		elif(probabilidad <= 0.01 and self.estado == Tortuga.EstadoTortuga.tapar):
 			self.estado = Tortuga.EstadoTortuga.inactiva
 			desactivada = True
-		elif((probabilidad <= 0.01 and self.estado == Tortuga.EstadoTortuga.camuflar):
+		elif(probabilidad <= 0.01 and self.estado == Tortuga.EstadoTortuga.camuflar):
 			self.estado = Tortuga.EstadoTortuga.inactiva
 			desactivada = True
 		return desactivada
@@ -113,7 +111,7 @@ class Tortuga:
 	## la desviacion estandar es algo diferente para cada tortuga
 	@classmethod
 	def cambiar_estado(self, archivo):
-		if(!proba_desactivarse(self, archivo)):
+		if not(proba_desactivarse(self, archivo)):
 			if(self.estado == Tortuga.EstadoTortuga.vagar and duracion_actual >= duraciones[0]):
 				self.estado = Tortuga.EstadoTortuga.camar
 				duracion_actual = 0
@@ -123,14 +121,14 @@ class Tortuga:
 			elif(self.estado == Tortuga.EstadoTortuga.excavar and duracion_actual >= duraciones[2]):
 				self.estado = Tortuga.EstadoTortuga.poner
 				duracion_actual = 0
-			elif(self.estado == Tortuga.EstadoTortuga.poner and duracion_actual >= duraciones[3])
+			elif(self.estado == Tortuga.EstadoTortuga.poner and duracion_actual >= duraciones[3]):
 				self.estado = Tortuga.EstadoTortuga.tapar
 				duracion_actual = 0
-			elif(self.estado == Tortuga.EstadoTortuga.tapar and duracion_actual >= duraciones[4])
+			elif(self.estado == Tortuga.EstadoTortuga.tapar and duracion_actual >= duraciones[4]):
 				self.estado = Tortuga.EstadoTortuga.camuflar
 				
+		
 	## EFE: avanza la tortuga de acuerdo con su estado
 	def avanzar(self):
-		#duracion_actual++
 		return
 	
