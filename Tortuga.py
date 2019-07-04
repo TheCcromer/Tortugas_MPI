@@ -34,33 +34,47 @@ class Tortuga:
 	## MÉTODOS DE INSTANCIA
 	
 	## EFE: crea una tortuga inicializada al azar.
+	@classmethod
 	def __init__(self):
 		self.id = Tortuga.id
 		Tortuga.id += 1
 		self.velocidad = np.random.normal(1.0, 0.5) ## promedio = 1.0 y desviación estándar = 0.5
 		self.posicion = random.randint(0, 1499), random.randint(0, 1499) ## OJO: así se crea un par ordenado, un tuple de dos valores
 		self.estado = Tortuga.EstadoTortuga.inactiva ##se inicializa inactiva y cuando arriba es cuando se le asigna el estado de vagar
+		self.sector = self.determinar_sector(self.posicion)
+		self.duraciones = []
+		self.contador_tics = 0
 		return 
 	
+	@classmethod
+	def determinar_sector(self,pos):
+		return pos[1] // 100 
+	
 	## EFE: retorna una hilera en formato JSON que representa a la tortuga
+	@classmethod
 	def toJSON(self):
 		# (type(self).__name__ retorna como hilera el nombre de la clase de self
 		# se le pasa un tuple con el nombre de la clase y los valores de los atributos de self
 		return json.dumps((type(self).__name__, self.id, self.velocidad, self.posicion))
 	
+	@classmethod
 	def obt_id(self):
 		return self.id
-		
+	
+	@classmethod	
 	def obt_velocidad(self):
 		return self.velocidad
 	
+	@classmethod
 	def obt_posicion(self):
 		return self.posicion
-		
+	
+	@classmethod	
 	def asg_velocidad(self, vn):
 		self.velocidad = vn
 		return
-		
+	
+	@classmethod	
 	def asg_posicion(self, pn):
 		self.posicion = pn
 		return
@@ -70,22 +84,22 @@ class Tortuga:
 		probabilidad  = np.random.uniform(low = 0.0, high = 1.0, size = None)
 		desactivada = False
 		# remplazar los valores de probabilidad necesarios para cambiar de estado por lo que se va a leer de los archivos
-		if(probabilidad <= 0.2 and self.estado == Tortuga.EstadoTortuga.vagar):
+		if(probabilidad <= archivo[0][0] and self.estado == Tortuga.EstadoTortuga.vagar):
 			self.estado = Tortuga.EstadoTortuga.inactiva
 			desactivada = True
-		elif(probabilidad <= 0.2 and self.estado == Tortuga.EstadoTortuga.camar):
+		elif(probabilidad <= archivo[0][1] and self.estado == Tortuga.EstadoTortuga.camar):
 			self.estado = Tortuga.EstadoTortuga.inactiva
 			desactivada = True
-		elif(probabilidad <= 0.6 and self.estado == Tortuga.EstadoTortuga.excavar):
+		elif(probabilidad <= archivo[0][2] and self.estado == Tortuga.EstadoTortuga.excavar):
 			self.estado = Tortuga.EstadoTortuga.inactiva
 			desactivada = True
-		elif(probabilidad <= 0.2 and self.estado == Tortuga.EstadoTortuga.poner):
+		elif(probabilidad <= archivo[0][3]and self.estado == Tortuga.EstadoTortuga.poner):
 			self.estado = Tortuga.EstadoTortuga.inactiva
 			desactivada = True
-		elif(probabilidad <= 0.01 and self.estado == Tortuga.EstadoTortuga.tapar):
+		elif(probabilidad <= archivo[0][4] and self.estado == Tortuga.EstadoTortuga.tapar):
 			self.estado = Tortuga.EstadoTortuga.inactiva
 			desactivada = True
-		elif(probabilidad <= 0.01 and self.estado == Tortuga.EstadoTortuga.camuflar):
+		elif(probabilidad <= archivo[0][5] and self.estado == Tortuga.EstadoTortuga.camuflar):
 			self.estado = Tortuga.EstadoTortuga.inactiva
 			desactivada = True
 		return desactivada
@@ -94,18 +108,17 @@ class Tortuga:
 	## Inicializa las duraciones de cada estado de cada tortuga
 	@classmethod
 	def inicializar_duraciones(self, archivo):
-		duracion_camar = np.random.normal(1.58,1.44,None) #distribucion normal de camar
-		duracion_excavar = np.random.normal(12.35,4.92,None) #distribucion normal de excavar
-		duracion_poner = np.random.normal(11.64,4.34,None) #distribucion normal de poner
-		duracion_tapar = np.random.normal(4.98,3.74,None) #distribucion normal de tapar
-		duracion_camuflar = np.random.normal(5.01,1.81,None) #distribucion normal de camuflar
-		duracion_vagar = 372-(duracion_camar+duracion_excavar+duracion_poner+duracion_tapar+duracion_camuflar) 
-		duraciones.append(duracion_vagar) #duracion de vagar
-		duraciones.append(duracion_camar) #duracion de camar, etc...
-		duraciones.append(duracion_excavar) 
-		duraciones.append(duracion_poner) 
-		duraciones.append(duracion_tapar)	
-		duraciones.append(duracion_camuflar) 
+		duracion_camar = np.random.normal(archivo[1][0],archivo[1][1],None) #distribucion normal de camar
+		duracion_excavar = np.random.normal(archivo[1][2],archivo[1][3],None) #distribucion normal de excavar
+		duracion_poner = np.random.normal(archivo[1][4],archivo[1][5],None) #distribucion normal de poner
+		duracion_tapar = np.random.normal(archivo[1][6],archivo[1][7],None) #distribucion normal de tapar
+		duracion_camuflar = np.random.normal(archivo[1][8],archivo[1][9],None) #distribucion normal de camuflar
+		## vagar 
+		self.duraciones.append(duracion_camar) #duracion de camar, etc...
+		self.duraciones.append(duracion_excavar) 
+		self.duraciones.append(duracion_poner) 
+		self.duraciones.append(duracion_tapar)	
+		self.duraciones.append(duracion_camuflar) 
 		
 	## este metodo esta directamente relacionado a avanzar y la desviacion estandar de la duracion de cada estado
 	## la desviacion estandar es algo diferente para cada tortuga
@@ -126,9 +139,61 @@ class Tortuga:
 				duracion_actual = 0
 			elif(self.estado == Tortuga.EstadoTortuga.tapar and duracion_actual >= duraciones[4]):
 				self.estado = Tortuga.EstadoTortuga.camuflar
-				
+	
+	#EFE: determina la localizacion en la que se encuentra la tortuga para que con las repectivas probabilidades cambie de estado			
+	@classmethod
+	def cambio_de_vagar(cls,terreno,comportamiento):
+		if(terreno[self.sector][1] > self.posicion[1] and  self.posicion[1] > terreno[self.sector][1] - 10):
+			if(random.randfloat(0, 1) < comportamiento[2][0]):
+				self.estado = Tortuga.EstadoTortuga.camar
+				inicializar_duraciones(comportamiento)
+		if(terreno[self.sector][1] < self.posicion[1] and  self.posicion[1] < terreno[self.sector][1] + 10):
+			if(random.randfloat(0, 1) < comportamiento[2][1]):
+				self.estado = Tortuga.EstadoTortuga.camar
+				inicializar_duraciones(comportamiento)
+		if(terreno[self.sector][1] + 10 < self.posicion[1] and  self.posicion[1] < terreno[self.sector][1] + 20):
+			if(random.randfloat(0, 1) < comportamiento[2][2]):
+				self.estado = Tortuga.EstadoTortuga.camar
+				inicializar_duraciones(comportamiento)
+		if(terreno[self.sector][1] + 20 < self.posicion[1] and  self.posicion[1] < terreno[self.sector][1] + 30):
+			if(random.randfloat(0, 1) < comportamiento[2][3]):
+				self.estado = Tortuga.EstadoTortuga.camar
+				inicializar_duraciones(comportamiento)
+			 
+	
 		
 	## EFE: avanza la tortuga de acuerdo con su estado
-	def avanzar(self):
+	@classmethod
+	def avanzar(self,terreno,comportamiento):
+		if(self.estado == Tortuga.EstadoTortuga.vagar):
+			self.posicion[1] = self.posicion[1] + velocidad
+			cambio_de_vagar(terreno,comportamiento)
+		elif not(self.estado == Tortuga.EstadoTortuga.inactiva):
+			self.contador_tics = self.contador_tics + 1
+			if(self.estado == Tortuga.EstadoTortuga.camar):
+				if(self.contador_tics >= duraciones[0]):
+					if not(proba_desactivarse()):	
+						self.estado = Tortuga.EstadoTortuga.excavar
+						self.contador_tics = 0
+			elif(self.estado == Tortuga.EstadoTortuga.excavar):
+				if(self.contador_tics >= duraciones[1]):
+					if not(proba_desactivarse()):
+						self.estado = Tortuga.EstadoTortuga.poner
+						self.contador_tics = 0
+			elif(self.estado == Tortuga.EstadoTortuga.poner):
+				if(self.contador_tics >= duraciones[2]):
+					if not(proba_desactivarse()):
+						self.estado = Tortuga.EstadoTortuga.tapar
+						self.contador_tics = 0
+			elif(self.estado == Tortuga.EstadoTortuga.tapar):
+				if(self.contador_tics >= duraciones[3]):
+					if not(proba_desactivarse()):
+						self.estado = Tortuga.EstadoTortuga.camuflar
+						self.contador_tics = 0
+			elif(self.estado == Tortuga.EstadoTortuga.camuflar):
+				if(self.contador_tics >= duraciones[4]):
+					if not(proba_desactivarse()):
+						self.estado = Tortuga.EstadoTortuga.inactiva
+						self.contador_tics = 0
 		return
 	

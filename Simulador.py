@@ -45,15 +45,15 @@ class Simulador:
 	def inicializar_arribada(cls, comportamiento, nt): #se debe llamar este metodo cada vez que haya un cambio en la marea, las tortugas inicializadas avanzan
 		comportamiento_tortugas = comportamiento
 	##	tortugas = Tortuga.crear_lista_tortugas(nt) # se inicializan en el main, aqui lo que se hace es activarlas
-		if(id_marea == 1 and cantidad_arribadas == 0):
+		if(cls.id_marea == 1 and cantidad_arribadas == 0):
 			cantidad_arribadas = cantidad_arribadas+1
 			for i in range(0.25 * len(tortugas)):
 				tortugas[i].avanzar()
-		elif(id_marea == 2 and cantidad_arribadas == 1):
+		elif(cls.id_marea == 2 and cantidad_arribadas == 1):
 			cantidad_arribadas = cantidad_arribadas+1
 			for i in range(0.26 * len(tortugas),0.50 * len(tortugas)):
 				tortugas[i].avanzar()
-		elif(id_marea == 3 and cantidad_arribadas == 2):
+		elif(cls.id_marea == 3 and cantidad_arribadas == 2):
 			cantidad_arribadas = cantidad_arribadas+1
 			for i in range(0.51 * len(tortugas),len(tortugas)):
 					tortugas[i].avanzar()
@@ -89,40 +89,37 @@ class Simulador:
 		
 	#determina los rangos de duracion de las mareas usando metodos de probabilidad 
 	@classmethod
-	def distribucion_duracion_mareas():
+	def distribucion_duracion_mareas(cls):
 		nivel_mareas = []
 		nivel_mareas.append(2.2 * 0.33)
 		nivel_mareas.append(nivel_mareas[0] + 2.2 * 0.45)
-		return mareas
+		return nivel_mareas
 		
 	@classmethod
-	def determinar_altura_marea(archivo):
+	def determinar_altura_marea(cls,tic):
 		return 0.004301 * tic + 0.6
 	
 	@classmethod
-	def determinar_tipo_marea(): 
+	def determinar_tipo_marea(cls,nivel_mareas, altura_marea): 
 		marea_id = 0
-		hubo_cambio = False
-		if(determinar_altura_marea() >= marea[0] and determinar_altura_marea() < marea[1] ):
+		hubo_cambio = False ## esta variable se utiliza mas tarde para saber si hubo cambio y llamar a arribada
+		if(altura_marea >= cls.marea[0] and altura_marea < nivel_mareas[0] ):
 			marea_id = 1
-			cantidad_arribadas = cantidad_arribadas+1
 			hubo_cambio = True
-		elif(determinar_altura_marea() >= marea[1] and determinar_altura_marea() < marea[2]):
+		elif(altura_marea >= nivel_mareas[0] and altura_marea < nivel_mareas[1]):
 			marea_id = 2
-			cantidad_arribadas = cantidad_arribadas+1
 			hubo_cambio = True
-		elif(determinar_altura_marea() >= marea[2] and determinar_altura_marea() < marea[2]):
+		elif(altura_marea >= nivel_mareas[1] and altura_marea < cls.marea[1]):
 			marea_id = 3
-			cantidad_arribadas = cantidad_arribadas+1
 			hubo_cambio = True
 		return hubo_cambio
 	
 	@classmethod 
-	def formula_TPB(Nc,m,i):
+	def formula_TPB(cls,Nc,m,i):
 		return Nc * i / (4.2 * m)
 	
 	@classmethod
-	def formula_TVB(A,d,w,m,Nc):
+	def formula_TVB(cls,A,d,w,m,Nc):
 		j = 0
 		for i in range (transectos_verticales[0][1]):
 			j = j + 2
@@ -130,14 +127,24 @@ class Simulador:
 		return (A*d / (2*w*m*j)) * (Nc / pt)
 	
 	@classmethod
-	def formula_C(Nc,d,m):
+	def formula_C(cls,Nc,d,m):
 		Ac = cuadrantes[1][2] - cuadrantes[1][0] * cuadrantes[1][3] - cuadrantes[1][1]
 		#A = #area de observacion total entre la berma y las dunas
 		return Nc * 1.25 * (Ac / A) * d / (1.08 * m)		
 	
 	@classmethod
-	def simular(cls,tics):
-		print(cls.marea[0])
+	def simular(cls,tics,comportamiento):
+		cls.comportamiento_tortugas = comportamiento
+		nivel_mareas = cls.distribucion_duracion_mareas()
+		for tic_actual in range(tics):
+			altura_marea = cls.determinar_altura_marea(tic_actual)
+			hubo_cambio_de_marea = cls.determinar_tipo_marea(nivel_mareas, altura_marea) 
+			if(hubo_cambio_de_marea):
+				x = 0
+				#cls.inicializar_arribada()
+			
+			
+			
 		
 			
 	## DE ESTA CLASE SIMULADOR SÓLO EXISTIRÍA UNA INSTANCIA (SINGLETON).
