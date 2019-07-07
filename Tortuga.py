@@ -78,7 +78,11 @@ class Tortuga:
 	def asg_posicion(self, pn):
 		self.posicion = pn
 		return
-	 
+	@classmethod
+	def activar_tortuga(self):
+		if(self.estado == Tortuga.EstadoTortuga.inactiva):
+			self.estado = Tortuga.EstadoTortuga.vagar
+	
 	@classmethod
 	def proba_desactivarse(self, archivo):
 		probabilidad  = np.random.uniform(low = 0.0, high = 1.0, size = None)
@@ -140,7 +144,8 @@ class Tortuga:
 			elif(self.estado == Tortuga.EstadoTortuga.tapar and duracion_actual >= duraciones[4]):
 				self.estado = Tortuga.EstadoTortuga.camuflar
 	
-	#EFE: determina la localizacion en la que se encuentra la tortuga para que con las repectivas probabilidades cambie de estado			
+	#EFE: determina la localizacion en la que se encuentra la tortuga para que con las repectivas probabilidades cambie de estado		
+	#Recibe la matriz correspondiente a terreno
 	@classmethod
 	def cambio_de_vagar(cls,terreno,comportamiento):
 		if(terreno[self.sector][1] > self.posicion[1] and  self.posicion[1] > terreno[self.sector][1] - 10):
@@ -168,32 +173,33 @@ class Tortuga:
 		if(self.estado == Tortuga.EstadoTortuga.vagar):
 			self.posicion[1] = self.posicion[1] + velocidad
 			cambio_de_vagar(terreno,comportamiento)
-		elif not(self.estado == Tortuga.EstadoTortuga.inactiva):
-			self.contador_tics = self.contador_tics + 1
-			if(self.estado == Tortuga.EstadoTortuga.camar):
-				if(self.contador_tics >= duraciones[0]):
-					if not(proba_desactivarse()):	
-						self.estado = Tortuga.EstadoTortuga.excavar
-						self.contador_tics = 0
-			elif(self.estado == Tortuga.EstadoTortuga.excavar):
-				if(self.contador_tics >= duraciones[1]):
-					if not(proba_desactivarse()):
-						self.estado = Tortuga.EstadoTortuga.poner
-						self.contador_tics = 0
-			elif(self.estado == Tortuga.EstadoTortuga.poner):
-				if(self.contador_tics >= duraciones[2]):
-					if not(proba_desactivarse()):
-						self.estado = Tortuga.EstadoTortuga.tapar
-						self.contador_tics = 0
-			elif(self.estado == Tortuga.EstadoTortuga.tapar):
-				if(self.contador_tics >= duraciones[3]):
-					if not(proba_desactivarse()):
-						self.estado = Tortuga.EstadoTortuga.camuflar
-						self.contador_tics = 0
-			elif(self.estado == Tortuga.EstadoTortuga.camuflar):
-				if(self.contador_tics >= duraciones[4]):
-					if not(proba_desactivarse()):
-						self.estado = Tortuga.EstadoTortuga.inactiva
-						self.contador_tics = 0
-		return
+		elif:
+			if not(self.estado ==  Tortuga.EstadoTortuga.inactiva):
+				self.contador_tics = self.contador_tics + 1
+				if(self.estado == Tortuga.EstadoTortuga.camar):
+					if(self.contador_tics >= duraciones[0]):
+						if not(proba_desactivarse()):	
+							self.estado = Tortuga.EstadoTortuga.excavar
+							self.contador_tics = 0
+				elif(self.estado == Tortuga.EstadoTortuga.excavar):
+					if(self.contador_tics >= duraciones[1]):
+						if not(proba_desactivarse()):
+							self.estado = Tortuga.EstadoTortuga.poner
+							self.contador_tics = 0
+				elif(self.estado == Tortuga.EstadoTortuga.poner):
+					if(self.contador_tics >= duraciones[2]):
+						if not(proba_desactivarse()):
+							self.estado = Tortuga.EstadoTortuga.tapar
+							self.contador_tics = 0
+				elif(self.estado == Tortuga.EstadoTortuga.tapar):
+					if(self.contador_tics >= duraciones[3]):
+						if not(proba_desactivarse()):
+							self.estado = Tortuga.EstadoTortuga.camuflar
+							self.contador_tics = 0
+				elif(self.estado == Tortuga.EstadoTortuga.camuflar):
+					if(self.contador_tics >= duraciones[4]):
+						if not(proba_desactivarse()):
+							self.estado = Tortuga.EstadoTortuga.inactiva
+							self.contador_tics = 0
+		#no se si esto deberia devolver algo, tenia un return
 	

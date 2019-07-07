@@ -24,7 +24,7 @@ class Simulador:
 	conteo_tpb = 0 		## variable para el conteo basado en transecto paralelo
 	conteo_tsv = 0		## variable para el conteo basado en transectos verticales
 	conteo_cs = 0		## variable para el conteo basado en cuadrantes
-	
+	marea_id = 0
 	## MÉTODOS DE CLASE
 	
 	## EFE:Inicializa los sectores de playa con sp. 
@@ -45,18 +45,15 @@ class Simulador:
 	def inicializar_arribada(cls, comportamiento, nt): #se debe llamar este metodo cada vez que haya un cambio en la marea, las tortugas inicializadas avanzan
 		comportamiento_tortugas = comportamiento
 	##	tortugas = Tortuga.crear_lista_tortugas(nt) # se inicializan en el main, aqui lo que se hace es activarlas
-		if(cls.id_marea == 1 and cantidad_arribadas == 0):
-			cantidad_arribadas = cantidad_arribadas+1
+		if(cls.id_marea == 1):
 			for i in range(0.25 * len(tortugas)):
-				tortugas[i].avanzar()
-		elif(cls.id_marea == 2 and cantidad_arribadas == 1):
-			cantidad_arribadas = cantidad_arribadas+1
-			for i in range(0.26 * len(tortugas),0.50 * len(tortugas)):
-				tortugas[i].avanzar()
-		elif(cls.id_marea == 3 and cantidad_arribadas == 2):
-			cantidad_arribadas = cantidad_arribadas+1
-			for i in range(0.51 * len(tortugas),len(tortugas)):
-					tortugas[i].avanzar()
+				tortugas[i].activar_tortuga()
+		elif(cls.id_marea == 2):
+			for i in range(0.25 * len(tortugas),0.75 * len(tortugas)):
+				tortugas[i].activar_tortuga()
+		elif(cls.id_marea == 3):
+			for i in range(0.75 * len(tortugas),len(tortugas)):
+				tortugas[i].activar_tortuga()
 		return
 
 	## EFE: Inicializa el transecto paralelo a la berma.
@@ -101,16 +98,15 @@ class Simulador:
 	
 	@classmethod
 	def determinar_tipo_marea(cls,nivel_mareas, altura_marea): 
-		marea_id = 0
 		hubo_cambio = False ## esta variable se utiliza mas tarde para saber si hubo cambio y llamar a arribada
-		if(altura_marea >= cls.marea[0] and altura_marea < nivel_mareas[0] ):
-			marea_id = 1
+		if(altura_marea >= cls.marea[0] and altura_marea < nivel_mareas[0] and cls.marea_id == 0):
+			cls.marea_id = 1
 			hubo_cambio = True
-		elif(altura_marea >= nivel_mareas[0] and altura_marea < nivel_mareas[1]):
-			marea_id = 2
+		elif(altura_marea >= nivel_mareas[0] and altura_marea < nivel_mareas[1] and cls.marea_id == 1):
+			cls.marea_id = 2
 			hubo_cambio = True
-		elif(altura_marea >= nivel_mareas[1] and altura_marea < cls.marea[1]):
-			marea_id = 3
+		elif(altura_marea >= nivel_mareas[1] and altura_marea < cls.marea[1] and cls.marea_id == 2):
+			cls.marea_id = 3
 			hubo_cambio = True
 		return hubo_cambio
 	
