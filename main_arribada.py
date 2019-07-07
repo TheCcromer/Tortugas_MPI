@@ -78,6 +78,7 @@ def inicializar_simulaciones(data_csv_matriz):
 	Simulador.inicializar_transectos_verticales(data_csv_matriz[4])
 	Simulador.inicializar_cuadrantes(data_csv_matriz[6])
 	Simulador.inicializar_contadores(Contador.crea_lista_Contadores(data_csv_matriz[5][0][0]), Contador.crea_lista_Contadores(data_csv_matriz[4][0][0]),Contador.crea_lista_Contadores(data_csv_matriz[6][0][0]))
+	Simulador.inicializar_comportamiento(data_csv_matriz[2])
 	for i in range (3):
 		Simulador.inicializar_tortugas(Tortuga.crea_lista_tortugas(int(data_csv_matriz[0][i][2])))
 		Simulador.simular(data_csv_matriz[1][0][2])

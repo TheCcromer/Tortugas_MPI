@@ -34,56 +34,49 @@ class Tortuga:
 	## MÉTODOS DE INSTANCIA
 	
 	## EFE: crea una tortuga inicializada al azar.
-	@classmethod
 	def __init__(self):
 		self.id = Tortuga.id
 		Tortuga.id += 1
 		self.velocidad = np.random.normal(1.0, 0.5) ## promedio = 1.0 y desviación estándar = 0.5
-		self.posicion = random.randint(0, 1499), random.randint(0, 1499) ## OJO: así se crea un par ordenado, un tuple de dos valores
+		self.posicion = random.randint(0, 1499), 0 ## OJO: así se crea un par ordenado, un tuple de dos valores
 		self.estado = Tortuga.EstadoTortuga.inactiva ##se inicializa inactiva y cuando arriba es cuando se le asigna el estado de vagar
 		self.sector = self.determinar_sector(self.posicion)
 		self.duraciones = []
 		self.contador_tics = 0
 		return 
 	
-	@classmethod
 	def determinar_sector(self,pos):
 		return pos[1] // 100 
 	
 	## EFE: retorna una hilera en formato JSON que representa a la tortuga
-	@classmethod
 	def toJSON(self):
 		# (type(self).__name__ retorna como hilera el nombre de la clase de self
 		# se le pasa un tuple con el nombre de la clase y los valores de los atributos de self
 		return json.dumps((type(self).__name__, self.id, self.velocidad, self.posicion))
 	
-	@classmethod
 	def obt_id(self):
 		return self.id
 	
-	@classmethod	
 	def obt_velocidad(self):
 		return self.velocidad
 	
-	@classmethod
 	def obt_posicion(self):
 		return self.posicion
-	
-	@classmethod	
+		
 	def asg_velocidad(self, vn):
 		self.velocidad = vn
 		return
 	
-	@classmethod	
 	def asg_posicion(self, pn):
-		self.posicion = pn
+		self.posicion[0] = random.randint(0, 1499)
+		self.posicion[1] = pn
 		return
-	@classmethod
+
 	def activar_tortuga(self):
 		if(self.estado == Tortuga.EstadoTortuga.inactiva):
 			self.estado = Tortuga.EstadoTortuga.vagar
-	
-	@classmethod
+		
+
 	def proba_desactivarse(self, archivo):
 		probabilidad  = np.random.uniform(low = 0.0, high = 1.0, size = None)
 		desactivada = False
@@ -110,7 +103,6 @@ class Tortuga:
 	
 	## sacar los datos de distribucion normal y el 372 de archivos
 	## Inicializa las duraciones de cada estado de cada tortuga
-	@classmethod
 	def inicializar_duraciones(self, archivo):
 		duracion_camar = np.random.normal(archivo[1][0],archivo[1][1],None) #distribucion normal de camar
 		duracion_excavar = np.random.normal(archivo[1][2],archivo[1][3],None) #distribucion normal de excavar
@@ -126,7 +118,6 @@ class Tortuga:
 		
 	## este metodo esta directamente relacionado a avanzar y la desviacion estandar de la duracion de cada estado
 	## la desviacion estandar es algo diferente para cada tortuga
-	@classmethod
 	def cambiar_estado(self, archivo):
 		if not(proba_desactivarse(self, archivo)):
 			if(self.estado == Tortuga.EstadoTortuga.vagar and duracion_actual >= duraciones[0]):
@@ -146,7 +137,6 @@ class Tortuga:
 	
 	#EFE: determina la localizacion en la que se encuentra la tortuga para que con las repectivas probabilidades cambie de estado		
 	#Recibe la matriz correspondiente a terreno
-	@classmethod
 	def cambio_de_vagar(cls,terreno,comportamiento):
 		if(terreno[self.sector][1] > self.posicion[1] and  self.posicion[1] > terreno[self.sector][1] - 10):
 			if(random.randfloat(0, 1) < comportamiento[2][0]):
@@ -168,7 +158,6 @@ class Tortuga:
 	
 		
 	## EFE: avanza la tortuga de acuerdo con su estado
-	@classmethod
 	def avanzar(self,terreno,comportamiento):
 		if(self.estado == Tortuga.EstadoTortuga.vagar):
 			self.posicion[1] = self.posicion[1] + velocidad
