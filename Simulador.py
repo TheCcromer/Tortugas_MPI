@@ -19,6 +19,7 @@ class Simulador:
 	contadores_TPB = []
 	contadores_TVB = []
 	contadores_C = []
+	total_tortugas_anidadas = 0
 	conteo_tpb = 0 		## variable para el conteo basado en transecto paralelo
 	conteo_tsv = 0		## variable para el conteo basado en transectos verticales
 	conteo_cs = 0		## variable para el conteo basado en cuadrantes
@@ -39,22 +40,25 @@ class Simulador:
 		
 	## EFE: Inicializa la arribada con el comportamiento de las tortugas y la cantidad 
 	## indicada por nt de tortugas a simular.
-	def inicializar_comportamiento(cls, comportamiento)
+	@classmethod 
+	def inicializar_comportamiento(cls, comportamiento):
 		cls.comportamiento_tortugas = comportamiento
+		return
+		
 	@classmethod
 	def inicializar_arribada(cls): #se debe llamar este metodo cada vez que haya un cambio en la marea, las tortugas inicializadas avanzan
-		if(cls.id_marea == 1):
-			for i in range(0.25 * len(tortugas)):
-				tortugas[i].activar_tortuga()
-				tortugas[i].asg_posicion(15)
-		elif(cls.id_marea == 2):
-			for i in range(0.25 * len(tortugas),0.75 * len(tortugas)):
-				tortugas[i].activar_tortuga()
-				tortugas[i].asg_posicion(30)
-		elif(cls.id_marea == 3):
-			for i in range(0.75 * len(tortugas),len(tortugas)):
-				tortugas[i].activar_tortuga()
-				tortugas[i].asg_posicion(40)
+		if(cls.marea_id == 1):
+			for i in range(int(0.25 * len(cls.tortugas))):
+				cls.tortugas[i].activar_tortuga()
+				cls.tortugas[i].asg_posicion(15)
+		elif(cls.marea_id == 2):
+			for i in range(int(0.25 * len(cls.tortugas)),int(0.75 * len(cls.tortugas))):
+				cls.tortugas[i].activar_tortuga()
+				cls.tortugas[i].asg_posicion(30)
+		elif(cls.marea_id == 3):
+			for i in range(int(0.75 * len(cls.tortugas)),len(cls.tortugas)):
+				cls.tortugas[i].activar_tortuga()
+				cls.tortugas[i].asg_posicion(40)
 		return
 
 	## EFE: Inicializa el transecto paralelo a la berma.
@@ -122,47 +126,100 @@ class Simulador:
 			hubo_cambio = True
 		return hubo_cambio
 	
+	@classmethod
+	def total_contadas_C(cls):
+		for i in range(len(cls.contadores_C)):
+			cls.conteo_cs = cls.conteo_cs + cls.contadores_C[i].obtener_contadas()
+		
+		
+	@classmethod
+	def total_contadas_TVB(cls):
+		for i in range(len(cls.contadores_TVB)):
+			cls.conteo_tsv = cls.conteo_tsv + cls.contadores_TVB[i].obtener_contadas()
+		
+	@classmethod
+	def total_contadas_TPB(cls):
+		for i in range(len(cls.contadores_TPB)):
+			cls.conteo_tpb = cls.conteo_tpb + cls.contadores_TPB[i].obtener_contadas()
+	
+	@classmethod		
+	def total_tortugas_anidaron(cls):
+		for i in range(len(cls.tortugas)):
+			if(cls.tortugas[i].obtener_si_anido()):
+				cls.total_tortugas_anidadas = cls.total_tortugas_anidadas + 1
+				
+		
+	
 	@classmethod 
-	def formula_TPB(cls,Nc,m,i):
-		return Nc * i / (4.2 * m)
+	#i es la cantidad de minutos entre muestreos, lo que dura caminando e inactivo
+	#m es la cantidad total de muestreos 
+	def formula_TPB(cls,m,i):
+		return cls.conteo_tpb * i / (4.2 * m)
 	
 	@classmethod
-	def formula_TVB(cls,A,d,w,m,Nc):
+	#d duracion en minutos de la simulacion 
+	#m es la cantidad total de muestreos 
+	#A el area de observación total en metros cuadrados (entra la berma y las dunas)
+	#w es el ancho en metros de cada transecto
+	def formula_TVB(cls,d,m):
 		j = 0
-		for i in range (transectos_verticales[0][1]):
+		A = 0
+		w = 2
+		for i in range (cls.transectos_verticales[0][1]):
 			j = j + 2
-		pt = 64.8 #me lo da el enunciado
-		return (A*d / (2*w*m*j)) * (Nc / pt)
+		for j in range(len(cls.contadores_TVB)):
+			A = A + 2 * ( cls.transectos_verticales[i + 1][2] -  cls.transectos_verticales[i + 1][1]) 
+		pt = 64.8 #me lo da el enunciado 
+		return (A*d / (2*w*m*j)) * (cls.conteo_tsv / pt)
 	
 	@classmethod
-	def formula_C(cls,Nc,d,m):
-		Ac = cuadrantes[1][2] - cuadrantes[1][0] * cuadrantes[1][3] - cuadrantes[1][1]
-		#A = #area de observacion total entre la berma y las dunas
-		return Nc * 1.25 * (Ac / A) * d / (1.08 * m)		
+	#Nc es la cantidad total de tortugas
+	#d duracion en minutos de la simulacion 
+	#m es la cantidad total de muestreos 
+	def formula_C(cls,d,m):  
+		Ac = (cls.cuadrantes[1][2] - cls.cuadrantes[1][0]) * (cls.cuadrantes[1][3] - cls.cuadrantes[1][1])
+		A = 0
+		for i in range(3):
+			A = A + (  cls.cuadrantes[i+1][2] - cls.cuadrantes[i + 1][0] ) * (cls.cuadrantes[i + 1][3] - cls.cuadrantes[i + 1][1])
+		return cls.conteo_cs * 1.25 * (Ac / A) * d / (1.08 * m)		
 	
 	@classmethod
-	def simular(cls,tics,comportamiento):
-		cls.comportamiento_tortugas = comportamiento
+	def simular(cls,tics):
+		cls.total_tortugas_anidadas = 0
+		cls.conteo_tpb = 0 		
+		cls.conteo_tsv = 0		
+		cls.conteo_cs = 0		
+		cls.marea_id = 0
 		nivel_mareas = cls.distribucion_duracion_mareas()
-		for tic_actual in range(tics):
-			altura_marea = cls.determinar_altura_marea(tic_actual)
+		for tic in range(tics):
+			altura_marea = cls.determinar_altura_marea(tic)
 			hubo_cambio_de_marea = cls.determinar_tipo_marea(nivel_mareas, altura_marea) 
 			if(hubo_cambio_de_marea):
 				cls.inicializar_arribada()
-			for t in range(len(tortugas)):
-				tortugas[t].avanzar(sectores_playa,comportamiento_tortugas)
-				if(tic % cuadrantes[0][1] == 0):
-					posicion_tortuga = tortugas[t].obt_posicion()
-					for i in range(len(contadores_C)):
-						if(posicion_tortuga[0] >= cuadrantes[i+1][0] and posicion_tortuga[0] <= cuadrantes[i+1][2] and posicion_tortuga[1] >= cuadrantes[i+1][1] and posicion_tortuga[1] <= cuadrantes[i+1][3]):
-							contadores_C[i].contar()
-				if(tic % transectos_verticales[0][1] == 0):
-					for i in range(len(contadores_TVB)):
-						if(posicion_tortuga[0] >= transectos_verticales[i+1][0] and posicion_tortuga[0] <= transectos_verticales[i+1][0]+2 and posicion_tortuga[1] >= transectos_verticales[i+1][1] and posicion_tortuga[1] <= transectos_verticales[i+1][2]):
-							contadores_TVB[i].contar()
-				if(tic % transecto_berma[0][1] == 0):
-					for i in range(len(contadores_TPB)):
-						if(posicion_tortuga[0] >= contadores_TPB[i].obt_posicion()[0] and posicion_tortuga[0] <= contadores_TPB[i].obt_posicion()[0]+30 and posicion_tortuga[1] >= contadores_TPB[i].obt_posicion()[1]-30 and posicion_tortuga[1] <= contadores_TPB[i].obt_posicion()[1]+30):
-							contadores_TPB[i].contar()
+			for t in range(len(cls.tortugas)):
+				cls.tortugas[t].avanzar(cls.sectores_playa,cls.comportamiento_tortugas)
+				if(tic % cls.cuadrantes[0][1] == 0): ##cada cuento los contadores por cuadrante cuentan
+					posicion_tortuga = cls.tortugas[t].obt_posicion()
+					for i in range(len(cls.contadores_C)):
+						if(posicion_tortuga[0] >= cls.cuadrantes[i+1][0] and posicion_tortuga[0] <= cls.cuadrantes[i+1][2] and posicion_tortuga[1] >= cls.cuadrantes[i+1][1] and posicion_tortuga[1] <= cls.cuadrantes[i+1][3]):
+							cls.contadores_C[i].contar()
+				if(tic % cls.transectos_verticales[0][1] == 0): ##cada cuento los contadores por transecto vertical cuentan
+					for i in range(len(cls.contadores_TVB)):
+						if(posicion_tortuga[0] >= cls.transectos_verticales[i+1][0] and posicion_tortuga[0] <= cls.transectos_verticales[i+1][0]+2 and posicion_tortuga[1] >= cls.transectos_verticales[i+1][1] and posicion_tortuga[1] <= cls.transectos_verticales[i+1][2]):
+							cls.contadores_TVB[i].contar()
+				if(tic % cls.transecto_berma[0][1] == 0):  ##cada cuento los contadores por transecto paralelo cuentan
+					for i in range(len(cls.contadores_TPB)): 
+						if(posicion_tortuga[0] >= cls.contadores_TPB[i].obt_posicion()[0] and posicion_tortuga[0] <= cls.contadores_TPB[i].obt_posicion()[0]+30 and posicion_tortuga[1] >= cls.contadores_TPB[i].obt_posicion()[1]-30 and posicion_tortuga[1] <= cls.contadores_TPB[i].obt_posicion()[1]+30):
+							cls.contadores_TPB[i].contar()
+		cls.total_contadas_C()
+		cls.total_contadas_TPB()
+		cls.total_contadas_TVB()
+		cls.total_tortugas_anidaron()
+		print("Cantidad total de tortugas:",len(cls.tortugas))
+		print("Cantidad de tortugas que en realidad anidaron:",cls.total_tortugas_anidadas)
+		print("Total contadas por los contadores de cuadrantes:", int(cls.formula_C(tics,tics//cls.cuadrantes[0][1])) )
+		print("Total contadas por los contadores de TVB:", int(cls.formula_TVB(tics,tics//cls.transectos_verticales[0][1])))
+		print("Total contadas por los contadores de TPB:", int(cls.formula_TPB(tics//cls.transecto_berma[0][1],cls.transecto_berma[0][1])))
+		
 	## DE ESTA CLASE SIMULADOR SÓLO EXISTIRÍA UNA INSTANCIA (SINGLETON).
 	## POR LO QUE NO SE INCLUYEN MÉTODOS DE INSTANCIA, SÓLO MÉTODOS DE CLASE

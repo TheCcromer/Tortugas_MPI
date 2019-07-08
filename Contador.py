@@ -32,7 +32,7 @@ class Contador:
 		self.id = Contador.id
 		Contador.id += 1
 		self.velocidad = 6
-		#self.posicion = random.randint(0, 1499), random.randint(0, 1499) ## OJO: así se crea un par ordenado, un tuple de dos valores
+		self.posicion = 0,0 ## OJO: así se crea un par ordenado, un tuple de dos valores
 		self.estado = Contador.EstadoContador.esperar
 		self.cantidad_contadas = 0
 		return
@@ -62,9 +62,12 @@ class Contador:
 	
 	def contar(self):
 		self.cantidad_contadas = self.cantidad_contadas+1
+		
+	def obtener_contadas(self):
+		return self.cantidad_contadas
 
 	## EFE: avanza la Contador de acuerdo con su estado
 	def avanzar(self):
-		self.posicion[0] = self.posicion[0] + self.velocidad
+		self.posicion = self.posicion[0] + self.velocidad, self.posicion[1]
 		return
 	

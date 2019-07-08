@@ -54,7 +54,7 @@ def crear_lista_de_archivos():
 def lectura_de_archivos(archivos_csv):
 	data_csv_matriz = []
 	for i in range(len(archivos_csv)):
-		if(i == 2 or i == 1 or i == 3):	
+		if(i == 2 or i == 1 or i == 3):	##es el numero de archivo que si se ocupa float 
 			try:
 				with open(archivos_csv[i]) as ct_csv:  #with open es la ruta donde se abre el archivo 
 					data_csv_matriz.append(lee_numeros_csv(ct_csv,Tipos_numeros.float))
@@ -81,7 +81,7 @@ def inicializar_simulaciones(data_csv_matriz):
 	Simulador.inicializar_comportamiento(data_csv_matriz[2])
 	for i in range (3):
 		Simulador.inicializar_tortugas(Tortuga.crea_lista_tortugas(int(data_csv_matriz[0][i][2])))
-		Simulador.simular(data_csv_matriz[1][0][2])
+		Simulador.simular(int(data_csv_matriz[1][0][2]))
 
 def main():
 	archivos_csv = crear_lista_de_archivos()
