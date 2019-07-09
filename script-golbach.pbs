@@ -1,0 +1,11 @@
+#PBS -N MPI_Tortugas.py  
+
+#PBS -q phi-n2h72
+
+#PBS -l nodes=5:ppn=2
+#PBS -l walltime=00:01:00
+
+
+module load intelpython/3.5
+
+mpiexec python ./MPI_Tortugas/main_arribada.py

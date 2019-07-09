@@ -7,6 +7,10 @@ from enum import Enum
 from Tortuga import Tortuga
 from Contador import Contador
 from Simulador import Simulador 
+##from mpi4py import MPI
+
+
+
 
 ## Para lectura de archivos de texto en python ver:
 ## https://www.pythonforbeginners.com/files/reading-and-writing-files-in-python
@@ -42,9 +46,9 @@ def lee_numeros_csv(archivo,tn):
 	
 def crear_lista_de_archivos():
 	archivos_csv = []
-	archivos_csv.append("experimentos.csv")
-	archivos_csv.append("marea.csv")
-	archivos_csv.append("comportamiento_tortugas.csv")
+	archivos_csv.append("experimentos.csv") 
+	archivos_csv.append("marea.csv") 
+	archivos_csv.append("comportamiento_tortugas.csv") 
 	archivos_csv.append("terreno.csv")
 	archivos_csv.append("transectos_verticales.csv")
 	archivos_csv.append("transecto_paralelo_berma.csv")
