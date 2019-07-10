@@ -7,11 +7,11 @@ from enum import Enum
 from Tortuga import Tortuga
 from Contador import Contador
 from Simulador import Simulador 
-##from mpi4py import MPI
+from mpi4py import MPI
 
-
-
-
+comm = MPI.COMM_WORLD
+pid = comm.rank
+size = comm.size
 ## Para lectura de archivos de texto en python ver:
 ## https://www.pythonforbeginners.com/files/reading-and-writing-files-in-python
 
@@ -46,9 +46,9 @@ def lee_numeros_csv(archivo,tn):
 	
 def crear_lista_de_archivos():
 	archivos_csv = []
-	archivos_csv.append("experimentos.csv") 
-	archivos_csv.append("marea.csv") 
-	archivos_csv.append("comportamiento_tortugas.csv") 
+	archivos_csv.append("experimentos.csv")
+	archivos_csv.append("marea.csv")
+	archivos_csv.append("comportamiento_tortugas.csv")
 	archivos_csv.append("terreno.csv")
 	archivos_csv.append("transectos_verticales.csv")
 	archivos_csv.append("transecto_paralelo_berma.csv")
@@ -83,12 +83,31 @@ def inicializar_simulaciones(data_csv_matriz):
 	Simulador.inicializar_cuadrantes(data_csv_matriz[6])
 	Simulador.inicializar_contadores(Contador.crea_lista_Contadores(data_csv_matriz[5][0][0]), Contador.crea_lista_Contadores(data_csv_matriz[4][0][0]),Contador.crea_lista_Contadores(data_csv_matriz[6][0][0]))
 	Simulador.inicializar_comportamiento(data_csv_matriz[2])
+	cantidades_totales = [0]*4
+	
 	for i in range (3):
-		Simulador.inicializar_tortugas(Tortuga.crea_lista_tortugas(int(data_csv_matriz[0][i][2])))
-		Simulador.simular(int(data_csv_matriz[1][0][2]))
-
+		for k in range(data_csv_matriz[0][i][0]):
+			inicio = MPI.Wtime()
+			Simulador.inicializar_tortugas(Tortuga.crea_lista_tortugas(int(data_csv_matriz[0][i][2])//size))
+			cantidades = Simulador.simular(int(data_csv_matriz[1][0][2]))
+			comm.barrier()
+			for j in range(4):
+				cantidades_totales[j] = comm.reduce(cantidades[j],op = MPI.SUM)
+			comm.barrier()
+			if(pid == 0):
+				final = MPI.Wtime()
+				print("Cantidad total de tortugas:",(int(data_csv_matriz[0][i][2])))
+				print("Cantidad de tortugas que en realidad anidaron:",cantidades_totales[0])
+				print("Total contadas por los contadores de cuadrantes:", cantidades_totales[1])
+				print("Total contadas por los contadores de TVB:", cantidades_totales[2])
+				print("Total contadas por los contadores de TPB:", cantidades_totales[3])
+				print("Tiempo total de esta simulacion", final - inicio)
+			cantidades_totales = [0]*4
+			comm.barrier()
+		comm.barrier()
 def main():
 	archivos_csv = crear_lista_de_archivos()
 	data_csv_matriz = lectura_de_archivos(archivos_csv)
 	inicializar_simulaciones(data_csv_matriz)
+	
 main()

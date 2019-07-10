@@ -48,9 +48,6 @@ class Tortuga:
 	
 	def determinar_sector(self,pos):
 		return pos[1] // 100 
-		
-	def obt_sector(self):
-		return self.sector	
 	
 	## EFE: retorna una hilera en formato JSON que representa a la tortuga
 	def toJSON(self):

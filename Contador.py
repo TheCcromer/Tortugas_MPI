@@ -34,15 +34,8 @@ class Contador:
 		self.velocidad = 6
 		self.posicion = 0,0 ## OJO: así se crea un par ordenado, un tuple de dos valores
 		self.estado = Contador.EstadoContador.esperar
-		self.sector = 0
 		self.cantidad_contadas = 0
 		return
-		
-	def determinar_sector(self,pos):
-		return pos[1] // 100 
-		
-	def obt_sector(self):
-		return self.sector	
 	
 	## EFE: retorna una hilera en formato JSON que representa a la Contador
 	def toJSON(self):
