@@ -81,13 +81,12 @@ def inicializar_simulaciones(data_csv_matriz):
 	Simulador.inicializar_transecto_berma(data_csv_matriz[5])
 	Simulador.inicializar_transectos_verticales(data_csv_matriz[4])
 	Simulador.inicializar_cuadrantes(data_csv_matriz[6])
-	Simulador.inicializar_contadores(Contador.crea_lista_Contadores(data_csv_matriz[5][0][0]), Contador.crea_lista_Contadores(data_csv_matriz[4][0][0]),Contador.crea_lista_Contadores(data_csv_matriz[6][0][0]))
 	Simulador.inicializar_comportamiento(data_csv_matriz[2])
 	cantidades_totales = [0]*4
-	
 	for i in range (3):
 		for k in range(data_csv_matriz[0][i][0]):
 			inicio = MPI.Wtime()
+			Simulador.inicializar_contadores(Contador.crea_lista_Contadores(data_csv_matriz[5][0][0]), Contador.crea_lista_Contadores(data_csv_matriz[4][0][0]),Contador.crea_lista_Contadores(data_csv_matriz[6][0][0]))
 			Simulador.inicializar_tortugas(Tortuga.crea_lista_tortugas(int(data_csv_matriz[0][i][2])//size))
 			cantidades = Simulador.simular(int(data_csv_matriz[1][0][2]))
 			comm.barrier()
