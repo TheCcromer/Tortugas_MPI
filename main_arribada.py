@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import sys
+from sys import argv
 import csv  # este es un modulo reader que permite leer los archivos csv 
 from enum import Enum
 
@@ -74,7 +74,7 @@ def lectura_de_archivos(archivos_csv):
 				print("Error de entrada-salida de archivos: {0}".format(oserror))		
 	return data_csv_matriz
 
-def inicializar_simulaciones(data_csv_matriz):
+def inicializar_simulaciones(data_csv_matriz,numero_experimento):
 	## solo es necesario inicializarlos una vez
 	Simulador.inicializar_marea(data_csv_matriz[1],0)
 	Simulador.inicializar_playa(data_csv_matriz[3])
@@ -83,30 +83,38 @@ def inicializar_simulaciones(data_csv_matriz):
 	Simulador.inicializar_cuadrantes(data_csv_matriz[6])
 	Simulador.inicializar_comportamiento(data_csv_matriz[2])
 	cantidades_totales = [0]*4
-	for i in range (3):
-		for k in range(data_csv_matriz[0][i][0]):
-			inicio = MPI.Wtime()
-			Simulador.inicializar_contadores(Contador.crea_lista_Contadores(data_csv_matriz[5][0][0]), Contador.crea_lista_Contadores(data_csv_matriz[4][0][0]),Contador.crea_lista_Contadores(data_csv_matriz[6][0][0]))
-			Simulador.inicializar_tortugas(Tortuga.crea_lista_tortugas(int(data_csv_matriz[0][i][2])//size))
-			cantidades = Simulador.simular(int(data_csv_matriz[1][0][2]))
-			comm.barrier()
-			for j in range(4):
-				cantidades_totales[j] = comm.reduce(cantidades[j],op = MPI.SUM)
-			comm.barrier()
-			if(pid == 0):
-				final = MPI.Wtime()
-				print("Cantidad total de tortugas:",(int(data_csv_matriz[0][i][2])))
-				print("Cantidad de tortugas que en realidad anidaron:",cantidades_totales[0])
-				print("Total contadas por los contadores de cuadrantes:", cantidades_totales[1])
-				print("Total contadas por los contadores de TVB:", cantidades_totales[2])
-				print("Total contadas por los contadores de TPB:", cantidades_totales[3])
-				print("Tiempo total de esta simulacion", final - inicio)
-			cantidades_totales = [0]*4
-			comm.barrier()
+	for k in range(data_csv_matriz[0][numero_experimento][0]):
+		inicio = MPI.Wtime()
+		Simulador.inicializar_contadores(Contador.crea_lista_Contadores(data_csv_matriz[5][0][0]), Contador.crea_lista_Contadores(data_csv_matriz[4][0][0]),Contador.crea_lista_Contadores(data_csv_matriz[6][0][0]))
+		Simulador.inicializar_tortugas(Tortuga.crea_lista_tortugas(int(data_csv_matriz[0][numero_experimento][2]) // size))
+		cantidades = Simulador.simular(int(data_csv_matriz[1][0][2]))
+		comm.barrier()
+		for j in range(4):
+			cantidades_totales[j] = comm.reduce(cantidades[j],op = MPI.SUM)
+		comm.barrier()
+		if(pid == 0):
+			final = MPI.Wtime()
+			print("Cantidad total de tortugas:",(int(data_csv_matriz[0][numero_experimento][2])))
+			print("Cantidad de tortugas que en realidad anidaron:",cantidades_totales[0])
+			print("Total contadas por los contadores de cuadrantes:", cantidades_totales[1])
+			print("Total contadas por los contadores de TVB:", cantidades_totales[2])
+			print("Total contadas por los contadores de TPB:", cantidades_totales[3])
+			print("Tiempo total de esta simulacion", final - inicio)
+		cantidades_totales = [0]*4
+		comm.barrier()
 		comm.barrier()
 def main():
-	archivos_csv = crear_lista_de_archivos()
-	data_csv_matriz = lectura_de_archivos(archivos_csv)
-	inicializar_simulaciones(data_csv_matriz)
-	
+	if(len(argv) == 2):
+		script, numero_experimento = argv
+		if(int(numero_experimento) > 0 and int(numero_experimento) < 4):
+			archivos_csv = crear_lista_de_archivos()
+			data_csv_matriz = lectura_de_archivos(archivos_csv)
+			inicializar_simulaciones(data_csv_matriz,int(numero_experimento) - 1)
+		else:
+			if(pid == 0):
+				print("El numero minimo tiene que ser 1 y el maximo tiene que ser 3")
+	else:
+		if(pid == 0):
+			print("Por favor pase por argumento el numero de experimento que desea realizar")
+			print("1 = 7000               2 = 70000             3 = 700000")
 main()

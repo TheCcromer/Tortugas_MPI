@@ -1,0 +1,11 @@
+#PBS -N Final_tortugas  
+
+#PBS -q phi-n6h96
+
+#PBS -l nodes=5:ppn=3
+#PBS -l walltime=01:00:00
+
+
+module load intelpython/3.5
+
+mpiexec python ./MPI_Tortugas/main_arribada.py 1
